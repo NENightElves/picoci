@@ -33,6 +33,12 @@ class Task:
         steps = Steps(j, self.taskdir)
         return steps
 
+    def run(self):
+        self.steps.run()
+
+    def reset(self):
+        self.steps.reset()
+
     def __str__(self):
         s = ''
         s += f'Task(name = {self.name}, taskpath = {self.taskpath})\n'

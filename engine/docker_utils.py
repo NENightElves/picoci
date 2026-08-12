@@ -28,3 +28,8 @@ def docker_rm(container_id):
 def docker_logs(container_id):
     client = docker.from_env()
     return client.containers.get(container_id).logs().decode('utf-8')
+
+
+def docker_get_exit_code(container_id):
+    client = docker.from_env()
+    return client.containers.get(container_id).attrs['State']['ExitCode']
