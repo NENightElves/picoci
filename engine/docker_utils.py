@@ -15,7 +15,8 @@ def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
     else:
         d['user'] = f'{os.getuid()}:{os.getgid()}'
     # d.update(kwargs)
-    container = client.containers.run(image=image_name, **d)
+    container = client.containers.create(image=image_name, **d)
+    container.start()
     return container.id
 
 
