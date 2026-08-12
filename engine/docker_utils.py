@@ -1,16 +1,20 @@
 import docker
+import os
 
 
-def docker_run(image_name, command=None, workdir=None, **kwargs):
+def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
     client = docker.from_env()
     d = {}
-    d['detach'] = False
     if command:
         d['command'] = command
     if workdir:
         d['working_dir'] = '/workspace'
         d['volumes'] = [f'{workdir}:/workspace']
-    d.update(kwargs)
+    if user:
+        d['user'] = user
+    else:
+        d['user'] = f'{os.getuid()}:{os.getgid()}'
+    # d.update(kwargs)
     container = client.containers.run(image=image_name, **d)
     return container
 
