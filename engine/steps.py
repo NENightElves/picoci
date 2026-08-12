@@ -1,5 +1,6 @@
 import docker_utils
 import os
+from datetime import datetime
 
 
 class Step:
@@ -26,6 +27,8 @@ class Step:
     def run(self):
         self.status = 'running'
         container_id = docker_utils.docker_run(self.image, self.command, self.workdir)
+        for _ in docker_utils.docker_logs_stream(container_id):
+            self.logger.log_container(container_id, _.decode('utf-8'))
         self.logs = docker_utils.docker_logs(container_id)
         status = docker_utils.docker_get_exit_code(container_id)
         docker_utils.docker_rm(container_id)
@@ -35,7 +38,7 @@ class Step:
             self.status = 'failed'
 
     def reset(self):
-        if self.container_id:
+        if self.container_id and docker_utils.docker_is_container_exist(self.container_id):
             docker_utils.docker_rm(self.container_id)
         self.logs = ''
         self.status = ''
@@ -78,15 +81,19 @@ class Steps:
 
     def run(self):
         self.status = 'running'
+        self.logger.log_steps(str(datetime.now())+self.status)
         self.progress = f'0/{len(self.steps)}'
+        self.logger.log_steps(str(datetime.now())+self.progress)
         for i, _ in enumerate(self.steps):
             _.run()
             self.progress = f'{i+1}/{len(self.steps)}'
+            self.logger.log_steps(str(datetime.now())+self.progress)
         self.status = 'completed'
         for _ in self.steps:
             if _.status != 'completed':
                 self.status = 'failed'
                 break
+        self.logger.log_steps(str(datetime.now())+self.status)
 
     def reset(self):
         for _ in self.steps:
