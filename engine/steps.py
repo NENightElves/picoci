@@ -4,7 +4,8 @@ import os
 
 class Step:
 
-    def __init__(self, j, taskdir):
+    def __init__(self, j, taskdir, logger):
+        self.logger = logger
         self.name = j['name']
         self.image = j['image']
         if 'commands' in j:
@@ -61,11 +62,13 @@ class Step:
 
 class Steps:
 
-    def __init__(self, j, taskdir):
+    def __init__(self, j, taskdir, logger):
         self.steps = []
         self.taskdir = taskdir
+        self.step_id = ''
+        self.logger = logger
         for _ in j:
-            self.steps.append(Step(_, taskdir))
+            self.steps.append(Step(_, taskdir, self.logger))
 
         self.status = ''
         self.progress = ''
@@ -99,6 +102,10 @@ class Steps:
 
     def get_progress(self):
         return self.progress
+
+    def set_step_id(self, step_id):
+        self.step_id = step_id
+        self.logger.set_step_id(step_id)
 
     def __str__(self):
         steps = []

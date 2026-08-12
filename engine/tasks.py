@@ -1,7 +1,9 @@
 import yaml
 import os
+import uuid
 from web import create_trigger
 from steps import Steps
+from logger import Logger
 
 
 class Task:
@@ -12,11 +14,16 @@ class Task:
         self.name = os.path.basename(taskpath)
         self.name, _ = os.path.splitext(self.name)
         self.taskdir = os.path.realpath("tasks/"+self.name)
+        self.logs_dir = os.path.realpath("logs/"+self.name)
         if not os.path.exists(self.taskdir):
             os.makedirs(self.taskdir)
+        if not os.path.exists(self.logs_dir):
+            os.makedirs(self.logs_dir)
         self.j = self.parse_yaml()
         self.set_triggers()
-        self.steps = self.set_steps()
+        self.steps = None
+        self.set_steps()
+        self.logger = Logger(self.name, self.logs_dir)
 
     def parse_yaml(self):
         with open(self.taskpath, 'r') as f:
@@ -30,11 +37,14 @@ class Task:
 
     def set_steps(self):
         j = self.j['steps']
-        steps = Steps(j, self.taskdir)
-        return steps
+        self.steps = Steps(j, self.taskdir, self.logger)
 
     def run(self):
+        self.logger.reset()
+        steps_id = str(uuid.uuid4())
+        self.steps.set_step_id(steps_id)
         self.steps.run()
+        self.logger.write()
 
     def reset(self):
         self.steps.reset()
