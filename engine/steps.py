@@ -105,7 +105,7 @@ class Steps:
 
     def set_step_id(self, step_id):
         self.step_id = step_id
-        self.logger.set_step_id(step_id)
+        self.logger.set_steps_id(step_id)
 
     def __str__(self):
         steps = []

@@ -20,10 +20,10 @@ class Task:
         if not os.path.exists(self.logs_dir):
             os.makedirs(self.logs_dir)
         self.j = self.parse_yaml()
+        self.logger = Logger(self.name, self.logs_dir)
         self.set_triggers()
         self.steps = None
         self.set_steps()
-        self.logger = Logger(self.name, self.logs_dir)
 
     def parse_yaml(self):
         with open(self.taskpath, 'r') as f:
