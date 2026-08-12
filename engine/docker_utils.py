@@ -22,3 +22,8 @@ def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
 def docker_rm(container_id):
     client = docker.from_env()
     client.containers.get(container_id).remove(force=True)
+
+
+def docker_logs(container_id):
+    client = docker.from_env()
+    return client.containers.get(container_id).logs().decode('utf-8')

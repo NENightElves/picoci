@@ -17,9 +17,11 @@ class Step:
             self.workdir = '.'
         self.workdir = taskdir + '/' + self.workdir
         self.workdir = os.path.realpath(self.workdir)
+        self.logs = ''
 
     def run(self):
-        docker_utils.docker_run(self.image, self.command, self.workdir)
+        container_id = docker_utils.docker_run(self.image, self.command, self.workdir)
+        self.logs = docker_utils.docker_logs(container_id)
 
     def __str__(self):
         d = {
@@ -41,6 +43,10 @@ class Steps:
 
     def get(self, index):
         return self.steps[index]
+
+    def run(self):
+        for i, _ in enumerate(self.steps):
+            _.run()
 
     def __str__(self):
         steps = []
