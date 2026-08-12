@@ -81,19 +81,19 @@ class Steps:
 
     def run(self):
         self.status = 'running'
-        self.logger.log_steps(str(datetime.now())+self.status)
+        self.logger.log_steps(str(datetime.now())+'\t'+self.status)
         self.progress = f'0/{len(self.steps)}'
-        self.logger.log_steps(str(datetime.now())+self.progress)
+        self.logger.log_steps(str(datetime.now())+'\t'+self.progress)
         for i, _ in enumerate(self.steps):
             _.run()
             self.progress = f'{i+1}/{len(self.steps)}'
-            self.logger.log_steps(str(datetime.now())+self.progress)
+            self.logger.log_steps(str(datetime.now())+'\t'+self.progress)
         self.status = 'completed'
         for _ in self.steps:
             if _.status != 'completed':
                 self.status = 'failed'
                 break
-        self.logger.log_steps(str(datetime.now())+self.status)
+        self.logger.log_steps(str(datetime.now())+'\t'+self.status)
 
     def reset(self):
         for _ in self.steps:

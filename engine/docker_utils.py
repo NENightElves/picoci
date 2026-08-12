@@ -13,8 +13,6 @@ def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
         d['volumes'] = [f'{workdir}:/workspace']
     if user:
         d['user'] = user
-    else:
-        d['user'] = f'{os.getuid()}:{os.getgid()}'
     # d.update(kwargs)
     container = client.containers.create(image=image_name, **d)
     container.start()
