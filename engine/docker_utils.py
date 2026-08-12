@@ -16,7 +16,7 @@ def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
         d['user'] = f'{os.getuid()}:{os.getgid()}'
     # d.update(kwargs)
     container = client.containers.run(image=image_name, **d)
-    return container
+    return container.id
 
 
 def docker_rm(container_id):
