@@ -12,7 +12,7 @@ class Task:
         self.name = os.path.basename(taskpath)
         self.name, _ = os.path.splitext(self.name)
         self.taskdir = os.path.realpath("tasks/"+self.name)
-        if not os.path.exists(taskpath):
+        if not os.path.exists(self.taskdir):
             os.makedirs(self.taskdir)
         self.j = self.parse_yaml()
         self.set_triggers()

@@ -1,4 +1,5 @@
 import docker_utils
+import os
 
 
 class Step:
@@ -8,13 +9,14 @@ class Step:
         self.image = j['image']
         if 'commands' in j:
             self.command = 'set -e\n'+'\n'.join(j['commands'])
-            self.command = "/bin/sh -c'\n" + self.command + "\n'"
+            self.command = "/bin/sh -c '\n" + self.command + "\n'"
         else:
             self.command = None
-        self.workdir = taskdir if 'workdir' not in j else j['workdir']
+        self.workdir = '.' if 'workdir' not in j else j['workdir']
         if '..' in self.workdir:
-            self.workdir = taskdir
+            self.workdir = '.'
         self.workdir = taskdir + '/' + self.workdir
+        self.workdir = os.path.realpath(self.workdir)
 
     def run(self):
         docker_utils.docker_run(self.image, self.command, self.workdir)
