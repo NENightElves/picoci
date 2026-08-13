@@ -7,7 +7,7 @@ from utils import get_tasks, check_trigger
 app = flask.Flask(__name__)
 
 
-@app.route('/trigger/{name}')
+@app.route('/trigger/<name>')
 def trigger(name):
     t = request.headers.get('Authorization', '')
     if check_trigger(name, t) == False:

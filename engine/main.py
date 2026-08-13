@@ -1,6 +1,7 @@
 from tasks import Tasks
 from utils import set_tasks
 from web import app as web
+import logging
 
 
 def run_web(port=5000):
@@ -14,4 +15,5 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
