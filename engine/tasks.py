@@ -30,7 +30,10 @@ class Task:
         j = self.j['triggers']
         for _ in j:
             if _['type'] == 'web-trigger':
-                create_trigger(self.name)
+                t = ''
+                if 'token' in _:
+                    t = _['token']
+                create_trigger(self.name, t)
 
     def set_steps(self):
         j = self.j['steps']

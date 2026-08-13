@@ -1,7 +1,9 @@
 import threading
 import os
+from tasks import Tasks
 
 l_container_writer = threading.Lock()
+tasks = None
 
 
 def log_container_create(container_id):
@@ -32,3 +34,15 @@ def log_container_remove(container_id):
             x.remove(container_id)
         with open('.containers', 'w') as f:
             f.write('\n'.join(x))
+
+
+def create_tasks(yamlsdir):
+    global tasks
+    if tasks:
+        tasks = Tasks(yamlsdir)
+    else:
+        tasks = Tasks()
+
+
+def get_tasks():
+    return tasks
