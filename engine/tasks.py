@@ -1,5 +1,6 @@
 import yaml
 import os
+import re
 import threading
 import uuid
 from datetime import datetime
@@ -9,27 +10,21 @@ from logger import Logger
 
 
 class Task:
-    def __init__(self, taskpath):
+    def __init__(self, name, j):
         if not os.path.exists('tasks'):
             os.makedirs('tasks')
-        self.taskpath = taskpath
-        self.name = os.path.basename(taskpath)
-        self.name, _ = os.path.splitext(self.name)
+        self.name = name
         self.taskdir = os.path.realpath("tasks/"+self.name)
         self.logs_dir = os.path.realpath("logs/"+self.name)
         if not os.path.exists(self.taskdir):
             os.makedirs(self.taskdir)
         if not os.path.exists(self.logs_dir):
             os.makedirs(self.logs_dir)
-        self.j = self.parse_yaml()
+        self.j = j
         self.logger = Logger(self.name, self.logs_dir)
         self.set_triggers()
         self.steps = None
         self.set_steps()
-
-    def parse_yaml(self):
-        with open(self.taskpath, 'r') as f:
-            return yaml.safe_load(f)
 
     def set_triggers(self):
         j = self.j['triggers']
@@ -73,7 +68,22 @@ class Tasks:
     def load(self):
         for taskpath in os.listdir(self.tasksdir):
             if taskpath.endswith('.yaml'):
-                task = Task(os.path.join(self.tasksdir, taskpath))
+                name = os.path.splitext(taskpath)[0]
+                d = {}
+                if os.path.exists(f'{name}.sec'):
+                    with open(f'{name}.sec', 'r') as f:
+                        t = f.read()
+                        for _ in t.split('\n'):
+                            if '=' in _:
+                                d[_[0:_.index('=')]] = _[_.index('=')+1:]
+                content = ''
+                with open(f'{name}.yaml', 'r') as f:
+                    content = f.read()
+                for k, v in d.items():
+                    pattern = r"\{\{\s*" + re.escape(k) + r"\s*\}\}"
+                    content = re.sub(pattern, v, content)
+                j = yaml.safe_load(content)
+                task = Task(os.path.join(self.tasksdir, name, j))
                 self.tasks[task.name] = task
 
     def run(self, name):
