@@ -51,7 +51,7 @@ class Task:
 
     def __str__(self):
         s = ''
-        s += f'Task(name = {self.name}, taskpath = {self.taskpath})\n'
+        s += f'Task(name = {self.name}, j = {self.j})\n'
         s += f'  Triggers: {self.j["triggers"]}\n'
         s += '  '+'\n  '.join(str(self.steps).split('\n'))
         return s
@@ -98,3 +98,9 @@ class Tasks:
             return
         self.tasks[name].stop()
         self.running_tasks[name].join()
+
+    def __str__(self):
+        s = []
+        for _ in self.tasks.values():
+            s.append(str(_))
+        return '\n'.join(s)
