@@ -1,5 +1,6 @@
 import docker
 import os
+import utils
 
 
 def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
@@ -15,6 +16,7 @@ def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
         d['user'] = user
     # d.update(kwargs)
     container = client.containers.create(image=image_name, **d)
+    utils.log_container_create(container.id)
     container.start()
     return container.id
 
@@ -28,6 +30,7 @@ def docker_stop(container_id):
 def docker_rm(container_id):
     client = docker.from_env()
     client.containers.get(container_id).remove(force=True)
+    utils.log_container_remove(container_id)
 
 
 def docker_logs(container_id):
