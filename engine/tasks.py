@@ -2,6 +2,7 @@ import yaml
 import os
 import threading
 import uuid
+from datetime import datetime
 from web import create_trigger
 from steps import Steps
 from logger import Logger
@@ -42,7 +43,7 @@ class Task:
 
     def run(self):
         self.logger.reset()
-        steps_id = str(uuid.uuid4())
+        steps_id = str(datetime.now()).split('.')[0].replace(' ', '-').replace(':', '-') + '_' + str(uuid.uuid4())
         self.steps.set_step_id(steps_id)
         self.steps.run()
         self.logger.write()

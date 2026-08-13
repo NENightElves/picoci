@@ -30,6 +30,8 @@ class Logger:
     def log_container(self, container_id, message):
         if container_id not in self.container_log:
             self.container_log[container_id] = []
+        if message.endswith('\n'):
+            message = message[:-1]
         self.container_log[container_id].append(message)
         self.logs.append(message)
         logger.info(message)
