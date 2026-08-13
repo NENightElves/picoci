@@ -1,7 +1,6 @@
 import threading
 import os
 from tasks import Tasks
-from web import app as web
 
 l_container_writer = threading.Lock()
 tasks = None
@@ -47,7 +46,3 @@ def create_tasks(yamlsdir):
 
 def get_tasks():
     return tasks
-
-
-def run_web(port=5000):
-    web.run(host='0.0.0.0', port=port)
