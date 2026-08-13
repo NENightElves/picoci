@@ -1,6 +1,5 @@
 import threading
 import os
-from tasks import Tasks
 
 trigger_dict = {}
 trigger_lock = threading.Lock()
@@ -49,12 +48,9 @@ def check_trigger(trigger_name, trigger_token):
     return False
 
 
-def create_tasks(yamlsdir):
+def set_tasks(t):
     global tasks
-    if tasks:
-        tasks = Tasks(yamlsdir)
-    else:
-        tasks = Tasks()
+    tasks = t
 
 
 def get_tasks():
