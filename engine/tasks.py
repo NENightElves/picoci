@@ -59,31 +59,31 @@ class Task:
 
 class Tasks:
 
-    def __init__(self, tasksdir):
-        self.tasksdir = tasksdir
+    def __init__(self, yamlsdir='yamls'):
+        self.yamlsdir = yamlsdir
         self.tasks = {}
         self.running_tasks = {}
         self.load()
 
     def load(self):
-        for taskpath in os.listdir(self.tasksdir):
+        for taskpath in os.listdir(self.yamlsdir):
             if taskpath.endswith('.yaml'):
                 name = os.path.splitext(taskpath)[0]
                 d = {}
-                if os.path.exists(f'{name}.sec'):
-                    with open(f'{name}.sec', 'r') as f:
+                if os.path.exists(os.path.join(self.yamlsdir, f'{name}.sec')):
+                    with open(os.path.join(self.yamlsdir, f'{name}.sec'), 'r') as f:
                         t = f.read()
                         for _ in t.split('\n'):
                             if '=' in _:
                                 d[_[0:_.index('=')]] = _[_.index('=')+1:]
                 content = ''
-                with open(f'{name}.yaml', 'r') as f:
+                with open(os.path.join(self.yamlsdir, f'{name}.yaml'), 'r') as f:
                     content = f.read()
                 for k, v in d.items():
                     pattern = r"\{\{\s*" + re.escape(k) + r"\s*\}\}"
                     content = re.sub(pattern, v, content)
                 j = yaml.safe_load(content)
-                task = Task(os.path.join(self.tasksdir, name, j))
+                task = Task(name, j)
                 self.tasks[task.name] = task
 
     def run(self, name):
