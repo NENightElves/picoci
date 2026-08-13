@@ -60,3 +60,9 @@ def docker_is_container_exist(container_id):
 def docker_get_exit_code(container_id):
     client = docker.from_env()
     return client.containers.get(container_id).attrs['State']['ExitCode']
+
+
+def docker_container_clean():
+    client = docker.from_env()
+    for _ in utils.log_container_list():
+        docker_rm(_)

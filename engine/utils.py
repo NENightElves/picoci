@@ -37,6 +37,18 @@ def log_container_remove(container_id):
             f.write('\n'.join(x))
 
 
+def log_container_list(container_id):
+    if not os.path.exists('.containers'):
+        return []
+    with l_container_writer:
+        x = []
+        with open('.containers', 'r') as f:
+            t = f.read()
+            if t != '':
+                x = t.split('\n')
+        return x
+
+
 def create_trigger(trigger_name, trigger_token=''):
     with trigger_lock:
         trigger_dict[trigger_name] = trigger_token
