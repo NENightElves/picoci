@@ -46,6 +46,9 @@ class Task:
         self.steps.run()
         self.logger.write()
 
+    def stop(self):
+        self.steps.stop()
+
     def reset(self):
         self.steps.reset()
 

@@ -32,10 +32,15 @@ class Step:
         self.logs = docker_utils.docker_logs(container_id)
         status = docker_utils.docker_get_exit_code(container_id)
         docker_utils.docker_rm(container_id)
-        if status == 0:
-            self.status = 'completed'
-        else:
-            self.status = 'failed'
+        if self.status != 'stopped':
+            if status == 0:
+                self.status = 'completed'
+            else:
+                self.status = 'failed'
+
+    def stop(self):
+        self.status = 'stopped'
+        docker_utils.docker_stop(self.container_id)
 
     def reset(self):
         if self.container_id and docker_utils.docker_is_container_exist(self.container_id):
@@ -75,6 +80,7 @@ class Steps:
 
         self.status = ''
         self.progress = ''
+        self.f_stop = False
 
     def get(self, index):
         return self.steps[index]
@@ -85,6 +91,10 @@ class Steps:
         self.progress = f'0/{len(self.steps)}'
         self.logger.log_steps(str(datetime.now())+'\t'+self.progress)
         for i, _ in enumerate(self.steps):
+            if self.f_stop:
+                self.status = 'stopped'
+                self.logger.log_steps(str(datetime.now())+'\t'+self.status)
+                break
             _.run()
             self.progress = f'{i+1}/{len(self.steps)}'
             self.logger.log_steps(str(datetime.now())+'\t'+self.progress)
@@ -95,11 +105,15 @@ class Steps:
                 break
         self.logger.log_steps(str(datetime.now())+'\t'+self.status)
 
+    def stop(self):
+        self.f_stop = True
+
     def reset(self):
         for _ in self.steps:
             _.reset()
         self.status = ''
         self.progress = ''
+        self.f_stop = False
 
     def isReady(self):
         return self.status != 'running'
