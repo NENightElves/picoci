@@ -2,6 +2,8 @@ import threading
 import os
 from tasks import Tasks
 
+trigger_dict = {}
+trigger_lock = threading.Lock()
 l_container_writer = threading.Lock()
 tasks = None
 
@@ -34,6 +36,17 @@ def log_container_remove(container_id):
             x.remove(container_id)
         with open('.containers', 'w') as f:
             f.write('\n'.join(x))
+
+
+def create_trigger(trigger_name, trigger_token=''):
+    with trigger_lock:
+        trigger_dict[trigger_name] = trigger_token
+
+
+def check_trigger(trigger_name, trigger_token):
+    if trigger_name in trigger_dict and trigger_token == trigger_dict[trigger_name]:
+        return True
+    return False
 
 
 def create_tasks(yamlsdir):

@@ -4,7 +4,7 @@ import re
 import threading
 import uuid
 from datetime import datetime
-from web import create_trigger
+from utils import create_trigger
 from steps import Steps
 from logger import Logger
 
