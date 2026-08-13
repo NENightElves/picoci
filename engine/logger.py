@@ -45,7 +45,7 @@ class Logger:
             'name': self.name,
             'steps_id': self.steps_id,
             'steps': self.steps,
-            'container_log': self.container_log
+            'step_log': self.step_log
         }
         with open(self.dir + '/' + self.steps_id + '.log', 'w') as f:
             f.write(json.dumps(d))

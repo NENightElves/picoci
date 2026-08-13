@@ -8,12 +8,12 @@ class Step:
     def __init__(self, j, taskdir, logger):
         self.logger = logger
         self.name = j['name']
-        self.logger.set_step_id(self.name)
         self.status = ''
         self.step = StepContainer(j, taskdir, logger)
 
     def run(self):
         self.status = 'running'
+        self.logger.set_step_id(self.name)
         self.step.run()
         self.status = self.step.get_status()
 
