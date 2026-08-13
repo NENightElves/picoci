@@ -37,7 +37,7 @@ def log_container_remove(container_id):
             f.write('\n'.join(x))
 
 
-def log_container_list(container_id):
+def log_container_list():
     if not os.path.exists('.containers'):
         return []
     with l_container_writer:
