@@ -1,5 +1,6 @@
 import yaml
 import os
+import threading
 import uuid
 from web import create_trigger
 from steps import Steps
@@ -58,3 +59,31 @@ class Task:
         s += f'  Triggers: {self.j["triggers"]}\n'
         s += '  '+'\n  '.join(str(self.steps).split('\n'))
         return s
+
+
+class Tasks:
+
+    def __init__(self, tasksdir):
+        self.tasksdir = tasksdir
+        self.tasks = {}
+        self.running_tasks = {}
+        self.load()
+
+    def load(self):
+        for taskpath in os.listdir(self.tasksdir):
+            if taskpath.endswith('.yaml'):
+                task = Task(os.path.join(self.tasksdir, taskpath))
+                self.tasks[task.name] = task
+
+    def run(self, name):
+        if name not in self.tasks or name in self.running_tasks:
+            return
+        t = threading.Thread(target=self.tasks[name].run)
+        self.running_tasks[name] = t
+        t.start()
+
+    def stop(self, name):
+        if name not in self.running_tasks:
+            return
+        self.tasks[name].stop()
+        self.running_tasks[name].join()

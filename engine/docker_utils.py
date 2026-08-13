@@ -19,6 +19,12 @@ def docker_run(image_name, command=None, workdir=None, user=None, **kwargs):
     return container.id
 
 
+def docker_stop(container_id):
+    if docker_is_container_exist(container_id):
+        client = docker.from_env()
+        client.containers.get(container_id).stop()
+
+
 def docker_rm(container_id):
     client = docker.from_env()
     client.containers.get(container_id).remove(force=True)
