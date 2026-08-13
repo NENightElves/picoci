@@ -1,0 +1,14 @@
+triggers:
+  - type: web-trigger
+    token: {{ example.token }}
+
+steps:
+  - name: step1
+    image: ubuntu:latest
+    commands:
+      - apt-get update
+      - echo "{{ word }} world" > test.txt
+  - name: step2
+    image: ubuntu:latest
+    commands:
+      - cat test.txt
