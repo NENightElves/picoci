@@ -14,8 +14,9 @@ class Logger:
         self.task_log = []
         self.steps_log = []
         self.steps = []
-        self.container_log = {}
+        self.step_log = {}
         self.steps_id = ''
+        self.step_id = ''
 
     def log_task(self, message):
         self.task_log.append(message)
@@ -27,17 +28,17 @@ class Logger:
         self.logs.append(message)
         logger.info(message)
 
-    def log_container(self, container_id, message):
-        if container_id not in self.container_log:
-            self.container_log[container_id] = []
-        if message.endswith('\n'):
-            message = message[:-1]
-        self.container_log[container_id].append(message)
+    def log_step(self, message):
+        self.step_log[self.step_id].append(message)
         self.logs.append(message)
         logger.info(message)
 
     def set_steps_id(self, steps_id):
         self.steps_id = steps_id
+
+    def set_step_id(self, step_id):
+        self.step_id = step_id
+        self.step_log[self.step_id] = []
 
     def write(self):
         d = {
@@ -54,5 +55,6 @@ class Logger:
         self.task_log = []
         self.steps_log = []
         self.steps = []
-        self.container_log = {}
+        self.step_log = {}
         self.steps_id = ''
+        self.step_id = ''

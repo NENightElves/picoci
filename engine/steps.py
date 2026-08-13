@@ -8,64 +8,31 @@ class Step:
     def __init__(self, j, taskdir, logger):
         self.logger = logger
         self.name = j['name']
-        self.image = j['image']
-        if 'commands' in j:
-            self.command = 'set -e\n'+'\n'.join(j['commands'])
-            self.command = "/bin/sh -c '\n" + self.command + "\n'"
-        else:
-            self.command = None
-        self.workdir = '.' if 'workdir' not in j else j['workdir']
-        if '..' in self.workdir:
-            self.workdir = '.'
-        self.workdir = taskdir + '/' + self.workdir
-        self.workdir = os.path.realpath(self.workdir)
-
-        self.logs = ''
+        self.logger.set_step_id(self.name)
         self.status = ''
-        self.container_id = ''
+        self.step = StepContainer(j, taskdir, logger)
 
     def run(self):
         self.status = 'running'
-        container_id = docker_utils.docker_run(self.image, self.command, self.workdir)
-        for _ in docker_utils.docker_logs_stream(container_id):
-            self.logger.log_container(container_id, _.decode('utf-8'))
-        self.logs = docker_utils.docker_logs(container_id)
-        status = docker_utils.docker_get_exit_code(container_id)
-        docker_utils.docker_rm(container_id)
-        if self.status != 'stopped':
-            if status == 0:
-                self.status = 'completed'
-            else:
-                self.status = 'failed'
+        self.step.run()
+        self.status = self.step.get_status()
 
     def stop(self):
+        self.step.stop()
         self.status = 'stopped'
-        docker_utils.docker_stop(self.container_id)
 
     def reset(self):
-        if self.container_id and docker_utils.docker_is_container_exist(self.container_id):
-            docker_utils.docker_rm(self.container_id)
-        self.logs = ''
+        self.step.reset()
         self.status = ''
-        self.container_id = ''
 
     def isReady(self):
         return self.status != 'running'
-
-    def get_logs(self):
-        return self.logs
 
     def get_status(self):
         return self.status
 
     def __str__(self):
-        d = {
-            'name': self.name,
-            'image': self.image,
-            'command': self.command.replace('\n', '\\n'),
-            'workdir': self.workdir
-        }
-        return f"Step({', '.join(f'{k}={v}' for k, v in d.items())})"
+        return f"Step(name = {self.name}, executor = {self.step})"
 
 
 class Steps:
@@ -133,3 +100,60 @@ class Steps:
         for i, _ in enumerate(self.steps):
             steps.append(str(i)+': '+str(_))
         return f'Steps(taskdir = {self.taskdir})\n  '+'\n  '.join(steps)
+
+
+class StepContainer:
+
+    def __init__(self, j, taskdir, logger):
+        self.logger = logger
+        self.image = j['image']
+        if 'commands' in j:
+            self.command = 'set -e\n'+'\n'.join(j['commands'])
+            self.command = "/bin/sh -c '\n" + self.command + "\n'"
+        else:
+            self.command = None
+        self.workdir = '.' if 'workdir' not in j else j['workdir']
+        if '..' in self.workdir:
+            self.workdir = '.'
+        self.workdir = taskdir + '/' + self.workdir
+        self.workdir = os.path.realpath(self.workdir)
+
+        self.status = ''
+        self.container_id = ''
+
+    def run(self):
+        self.status = 'running'
+        container_id = docker_utils.docker_run(self.image, self.command, self.workdir)
+        for _ in docker_utils.docker_logs_stream(container_id):
+            t = _.decode('utf-8')
+            if t.endswith('\n'):
+                t = t[:-1]
+            self.logger.log_step(t)
+        status = docker_utils.docker_get_exit_code(container_id)
+        docker_utils.docker_rm(container_id)
+        if self.status != 'stopped':
+            if status == 0:
+                self.status = 'completed'
+            else:
+                self.status = 'failed'
+
+    def stop(self):
+        self.status = 'stopped'
+        docker_utils.docker_stop(self.container_id)
+
+    def reset(self):
+        if self.container_id and docker_utils.docker_is_container_exist(self.container_id):
+            docker_utils.docker_rm(self.container_id)
+        self.status = ''
+        self.container_id = ''
+
+    def get_status(self):
+        return self.status
+
+    def __str__(self):
+        d = {
+            'image': self.image,
+            'command': self.command.replace('\n', '\\n'),
+            'workdir': self.workdir
+        }
+        return f"StepContainer({', '.join(f'{k}={v}' for k, v in d.items())})"
