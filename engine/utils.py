@@ -7,6 +7,20 @@ l_container_writer = threading.Lock()
 tasks = None
 
 
+def get_data_dir(d=None):
+    dd = os.environ.get('PICOCI_DATA_DIR', '/picoci/data')
+    if d is None:
+        return dd
+    return os.path.join(dd, d)
+
+
+def get_real_data_dir(d=None):
+    dd = os.environ.get('PICOCI_REAL_DATA_DIR', '/picoci/data')
+    if d is None:
+        return dd
+    return os.path.join(dd, d)
+
+
 def log_container_create(container_id):
     if not os.path.exists('.containers'):
         with open('.containers', 'w') as f:

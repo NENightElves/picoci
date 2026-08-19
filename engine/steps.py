@@ -1,6 +1,7 @@
 import docker_utils
 import os
 from datetime import datetime
+from utils import get_real_data_dir
 
 
 class Step:
@@ -115,15 +116,14 @@ class StepContainer:
         self.workdir = '.' if 'workdir' not in j else j['workdir']
         if '..' in self.workdir:
             self.workdir = '.'
-        self.workdir = taskdir + '/' + self.workdir
-        self.workdir = os.path.realpath(self.workdir)
+        self.workdir = os.path.join(taskdir, self.workdir)
 
         self.status = ''
         self.container_id = ''
 
     def run(self):
         self.status = 'running'
-        container_id = docker_utils.docker_run(self.image, self.command, self.workdir)
+        container_id = docker_utils.docker_run(self.image, self.command, get_real_data_dir(self.workdir))
         for _ in docker_utils.docker_logs_stream(container_id):
             t = _.decode('utf-8')
             if t.endswith('\n'):

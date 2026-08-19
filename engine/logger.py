@@ -1,5 +1,6 @@
 import logging
 import json
+from utils import get_data_dir
 
 logger = logging.getLogger('picoci')
 
@@ -8,7 +9,7 @@ class Logger:
 
     def __init__(self, name, logs_dir):
         self.name = name
-        self.dir = logs_dir
+        self.dir = get_data_dir(logs_dir)
 
         self.logs = []
         self.task_log = []

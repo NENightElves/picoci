@@ -14,8 +14,8 @@ class Task:
         if not os.path.exists('tasks'):
             os.makedirs('tasks')
         self.name = name
-        self.taskdir = os.path.realpath("tasks/"+self.name)
-        self.logs_dir = os.path.realpath("logs/"+self.name)
+        self.taskdir = os.path.join("tasks", self.name)
+        self.logs_dir = os.path.join("logs", self.name)
         if not os.path.exists(self.taskdir):
             os.makedirs(self.taskdir)
         if not os.path.exists(self.logs_dir):
@@ -62,7 +62,7 @@ class Task:
 
 class Tasks:
 
-    def __init__(self, yamlsdir='yamls'):
+    def __init__(self, yamlsdir='/picoci/yamls'):
         self.yamlsdir = yamlsdir
         self.tasks = {}
         self.running_tasks = {}
