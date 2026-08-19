@@ -7,7 +7,11 @@
 ```bash
 docker run -d --name picoci -p 5000:5000 \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -v $(pwd)/yamls:/app/yamls picoci
+    -v $(pwd)/yamls:/picoci/yamls \
+    -v /picoci/data:/picoci/data \
+    -e PICOCI_DATA_DIR=/picoci/data \
+    -e PICOCI_REAL_DATA_DIR=/picoci/data \
+    picoci
 ```
 Your `*.yaml` and `*.sec` should be placed in `$(pwd)/yamls`.
 
